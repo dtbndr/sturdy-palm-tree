@@ -90,6 +90,17 @@ digraph workstream_brainstorming {
 - Scale each section to its complexity: cover architecture, components, data flow, testing.
 - **Decompose into slices**: Break down the execution plan into sequential, logical groupings of tasks (Slice A, Slice B, Slice C...). Slices must represent clean milestones that can be independently developed, compiled, and tested.
 
+**Slice sizing principles:**
+- Slices are executed by low-cost models with limited context windows. Each slice must be small enough for a lightweight agent to implement without being overwhelmed.
+- A well-sized slice typically touches 1-5 files and can be described in a few task bullet points without needing code snippets.
+- If a slice requires extensive explanation to be unambiguous, it is too large — split it.
+- The workstream document intentionally contains no implementation code or pseudo-code. Key file paths, API contracts, database column names, and schema definitions are encouraged when needed to eliminate ambiguity, but raw code generation is offloaded entirely to the implementer. This means task descriptions must be precise enough to implement without being pseudo-code themselves.
+
+**Decision completeness:**
+- By the time the workstream document is finished, all design decisions that could require rework if chosen wrong MUST be resolved. If there are two or more valid ways to implement a task, and picking the wrong one would require rework — resolve it in the document. Pick one and state it explicitly.
+- The only decisions left to the implementer should be ones where any reasonable pick works fine (e.g., variable naming, internal helper decomposition, log message wording).
+- If you notice ambiguity during slice authoring where "there are two ways to do this," ask: would choosing wrong cause rework? If yes, resolve it now.
+
 ## Document Structure & Schema
 
 Use this exact structure for the Workstream Document written to `docs/workstreams/YYYY-MM-DD-<topic>.md`:
@@ -187,8 +198,10 @@ All criteria met:
 
 After writing the workstream document, look at it with fresh eyes:
 1. **Placeholder scan:** Any "TBD", "TODO", or vague requirements? Fix them.
-2. **Slice logical flow:** Is each slice clean? Does Slice B properly build on Slice A's carry-forward? Are they too large or too small?
-3. **Ambiguity check:** Pick one concrete path and eliminate double-interpretations.
+2. **Slice sizing:** Could a low-cost model with limited context implement each slice from these task descriptions alone? If a slice is too large or requires too much background, split it.
+3. **Decision completeness:** Are there any points where multiple valid approaches exist? For each, ask: would choosing wrong cause rework? If yes, resolve it here — the implementer should only face choices where any reasonable pick works fine.
+4. **Slice logical flow:** Does Slice B properly build on Slice A's carry-forward?
+5. **No code in the document:** Tasks describe WHAT to do, not HOW in code. If you wrote pseudo-code or snippets, remove them.
 
 Ask the user to review the written Workstream Document:
 

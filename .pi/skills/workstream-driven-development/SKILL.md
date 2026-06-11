@@ -99,9 +99,11 @@ For each slice, dispatch the implementer subagent. Provide:
 - Relevant existing code files (do NOT provide files unrelated to the slice).
 - Any carry-forward context from prior slices.
 
+**Context budget:** Implementers run on low-cost models. The curated prompt must fit comfortably in a small context window. If a slice's tasks + carry-forward + relevant files exceed what a lightweight model can hold, escalate to the user — the slice is too large and needs splitting in the Workstream Document.
+
 ### 3. Reviewing the Slice
 - **Stage 1 (Workstream Compliance)**: Once the implementer reports `DONE` or `DONE_WITH_CONCERNS`, dispatch the `workstream-reviewer`. The reviewer checks the code diff and actual behavior to verify every task inside the slice is perfectly met, nothing was missed, and no unrequested features were built.
-- **Stage 2 (Code Quality)**: Dispatch the `code-quality-reviewer`. They check readability, test coverage, and code organization (e.g. Svelte 5 runes, Redis connections, etc.).
+- **Stage 2 (Code Quality)**: Dispatch the `code-quality-reviewer`. They check readability, test coverage, maintainability, project conventions, and code organization.
 - If any reviewer flags an issue, have the implementer subagent fix it and re-review. Do NOT manually fix reviewer-flagged issues yourself.
 
 ### 4. Transitioning and Finalization
