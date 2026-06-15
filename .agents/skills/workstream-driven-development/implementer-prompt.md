@@ -24,6 +24,9 @@ Task tool (general-purpose):
     ## Verification
     [Paste the verification steps and tests to run for this slice here]
 
+    ## Manual Smoke Test
+    [Paste the manual smoke test steps, setup, and expected outcomes for this slice here]
+
     ## Prior Slice Carry-forward (if any)
     [Paste the carry-forward information from the previous slice, if any]
 
@@ -45,6 +48,8 @@ Task tool (general-purpose):
     4. Commit your work upon success
     5. Conduct a self-review (see below)
     6. Report back with status and details
+
+    The controller will pause for a user manual smoke test only after your slice passes both review stages. Make sure your implementation supports the documented manual smoke test cleanly.
 
     Work from: [directory]
 

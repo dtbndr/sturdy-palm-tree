@@ -12,9 +12,9 @@ Execute a Workstream Document by dispatching a fresh subagent per slice, with a 
 **Core principles:**
 1. **Single Git Worktree**: The entire workstream is executed within a single, isolated git worktree folder. We use the `using-git-worktrees` skill ONCE at the start of the workstream, and `finishing-a-development-branch` ONCE after the final slice is fully verified and completed. We do NOT create separate worktrees for each slice.
 2. **Sequential Slice Execution**: Slices (Slice A, B, C...) are completed one by one in order.
-3. **Curated Input**: The controller (you) extracts the slice goal, tasks, watch-outs, verification, and carry-forward from the Workstream Document, presenting a highly focused prompt to the implementer subagent.
+3. **Curated Input**: The controller (you) extracts the slice goal, tasks, watch-outs, verification, manual smoke test steps, and carry-forward from the Workstream Document, presenting a highly focused prompt to the implementer subagent.
 4. **Two-Stage Review**: For every slice, we run a Workstream Compliance Review, then a Code Quality Review.
-5. **Continuous Execution**: Do not pause to ask "should I continue?" between slices unless blocked. Proceed diligently from Slice A to the final slice.
+5. **Pause After Review Pass**: Preserve the existing implementer ↔ reviewer retry loop until both review stages pass. Only after the Workstream Compliance Review and Code Quality Review both pass do you pause for the user's manual smoke test for that slice.
 
 ## When to Use
 
@@ -38,6 +38,9 @@ digraph workstream_execution {
         "Dispatch code quality reviewer\n(./code-quality-reviewer-prompt.md)" [shape=box];
         "Code quality reviewer approves?" [shape=diamond];
         "Implementer fixes quality issues" [shape=box];
+        "Pause for user manual smoke test" [shape=box];
+        "User smoke test passes?" [shape=diamond];
+        "Implementer fixes smoke test issues" [shape=box];
         "Mark slice complete in Todo" [shape=box];
     }
 
@@ -62,7 +65,11 @@ digraph workstream_execution {
     "Dispatch code quality reviewer\n(./code-quality-reviewer-prompt.md)" -> "Code quality reviewer approves?";
     "Code quality reviewer approves?" -> "Implementer fixes quality issues" [label="no"];
     "Implementer fixes quality issues" -> "Dispatch code quality reviewer\n(./code-quality-reviewer-prompt.md)" [label="re-review"];
-    "Code quality reviewer approves?" -> "Mark slice complete in Todo" [label="yes"];
+    "Code quality reviewer approves?" -> "Pause for user manual smoke test" [label="yes"];
+    "Pause for user manual smoke test" -> "User smoke test passes?";
+    "User smoke test passes?" -> "Implementer fixes smoke test issues" [label="no"];
+    "Implementer fixes smoke test issues" -> "Dispatch workstream reviewer\n(./workstream-reviewer-prompt.md)" [label="re-review both stages"];
+    "User smoke test passes?" -> "Mark slice complete in Todo" [label="yes"];
     "Mark slice complete in Todo" -> "More slices remain?";
     "More slices remain?" -> "Dispatch implementer subagent\n(./implementer-prompt.md)" [label="yes"];
     "More slices remain?" -> "Verify whole workstream\n(Final verification section)" [label="no"];
@@ -95,7 +102,7 @@ The following prompt templates are stored in this skill's directory and MUST be 
 ### 2. Dispatching the Implementer
 For each slice, dispatch the implementer subagent. Provide:
 - The Workstream Objective and In-Scope details.
-- The Current Slice Goal, Tasks, Watch-Outs, and Verification instructions.
+- The Current Slice Goal, Tasks, Watch-Outs, Verification instructions, and Manual Smoke Test instructions.
 - Relevant existing code files (do NOT provide files unrelated to the slice).
 - Any carry-forward context from prior slices.
 
@@ -105,6 +112,8 @@ For each slice, dispatch the implementer subagent. Provide:
 - **Stage 1 (Workstream Compliance)**: Once the implementer reports `DONE` or `DONE_WITH_CONCERNS`, dispatch the `workstream-reviewer`. The reviewer checks the code diff and actual behavior to verify every task inside the slice is perfectly met, nothing was missed, and no unrequested features were built.
 - **Stage 2 (Code Quality)**: Dispatch the `code-quality-reviewer`. They check readability, test coverage, maintainability, project conventions, and code organization.
 - If any reviewer flags an issue, have the implementer subagent fix it and re-review. Do NOT manually fix reviewer-flagged issues yourself.
+- **Manual Smoke Test Pause**: Only after both review stages pass, pause and ask the user to run the slice's manual smoke test from the Workstream Document. Do not continue to the next slice until the user confirms the smoke test passed.
+- If the user reports a smoke test issue, send it back to the implementer and then re-run both review stages before asking for the manual smoke test again.
 
 ### 4. Transitioning and Finalization
 - When all slices are marked complete, run the commands listed in the **Final verification** section of the Workstream Document.
@@ -115,6 +124,7 @@ For each slice, dispatch the implementer subagent. Provide:
 - **Creating a new worktree per slice**: Absolutely NOT. Keep everything in one worktree.
 - **Letting subagents read the Workstream Doc**: Subagents should NOT read the Workstream Doc. Provide the curated text and tasks for their specific slice to protect their context window.
 - **Proceeding while a slice review fails**: Never start the next slice while there are open compliance or quality issues in the current slice.
+- **Skipping the manual smoke test pause**: Never continue to the next slice once both review stages pass without pausing for the user's manual smoke test.
 - **Failing to commit**: Ensure each slice is committed before starting reviews, and any fixes are also committed.
 
 ## Session Resume

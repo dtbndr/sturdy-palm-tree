@@ -11,7 +11,7 @@ Task tool (general-purpose):
     You are reviewing whether a slice implementation matches its specification.
 
     ## Slice Goal & Tasks
-    [FULL TEXT of the current slice goal, tasks, and verification requirements]
+    [FULL TEXT of the current slice goal, tasks, verification requirements, and manual smoke test requirements]
 
     ## What Implementer Claims They Built
     [From implementer's report]
@@ -50,6 +50,10 @@ Task tool (general-purpose):
     - Did they interpret requirements differently than the slice goal intended?
     - Did they solve the wrong problem or use a patterns-defying design?
     - Did they violate any architectural invariants?
+
+    **Manual smoke test readiness:**
+    - Does the implementation support the manual smoke test scenario defined for this slice?
+    - Are any required user-visible flows, setup assumptions, or expected outcomes obviously broken or missing?
 
     **Verify by reading code, not by trusting the report.**
 

@@ -22,7 +22,7 @@ A Workstream Document contains:
 2. **Context**: Problem description, Approved simplifications, Target behavior, Deliberate simplifications, Architecture invariants.
 3. **Scope**: In scope, Out of scope.
 4. **Key Files**: Table mapping file paths, packages, and their roles.
-5. **Scoped Slices**: Sequential slices (Slice A, B, C...) containing Goals, specific Tasks, Watch outs, Verification steps, and Carry-forwards.
+5. **Scoped Slices**: Sequential slices (Slice A, B, C...) containing Goals, specific Tasks, Watch outs, Verification steps, Manual smoke test guidelines, and Carry-forwards.
 6. **Final Verification**: Comprehensive validation checklist (compilation, typecheck, tests, lint, format).
 7. **Success Criteria**: Clear, testable outcomes that must be met.
 
@@ -170,6 +170,11 @@ What are the strict design, folder, or boundary rules that must never be violate
 #### Verification
 - Commands to run and assertions to check (use the project's actual test/build tooling)
 
+#### Manual smoke test
+- Setup / preconditions the user needs before testing
+- Explicit user actions to perform
+- Expected visible or behavioral outcome to confirm
+
 #### Carry-forward
 - State, APIs, or schema elements established in this slice that the next slice assumes to be present.
 
@@ -202,6 +207,7 @@ After writing the workstream document, look at it with fresh eyes:
 3. **Decision completeness:** Are there any points where multiple valid approaches exist? For each, ask: would choosing wrong cause rework? If yes, resolve it here — the implementer should only face choices where any reasonable pick works fine.
 4. **Slice logical flow:** Does Slice B properly build on Slice A's carry-forward?
 5. **No code in the document:** Tasks describe WHAT to do, not HOW in code. If you wrote pseudo-code or snippets, remove them.
+6. **Manual smoke test quality:** Does every slice include a concrete manual smoke test with setup/preconditions, explicit user actions, and expected outcomes? If not, add it.
 
 Ask the user to review the written Workstream Document:
 
