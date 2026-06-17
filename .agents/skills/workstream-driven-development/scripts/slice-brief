@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+# Extract one slice's full text from a Workstream Document into a file the
+# implementer reads in one call, so the slice text never has to be pasted
+# through the controller's context.
+#
+# Usage: slice-brief WORKSTREAM_FILE SLICE_LETTER [OUTFILE]
+# Default OUTFILE: <git-dir>/wsd/slice-<LETTER>-brief.md
+set -euo pipefail
+
+if [ $# -lt 2 ] || [ $# -gt 3 ]; then
+  echo "usage: slice-brief WORKSTREAM_FILE SLICE_LETTER [OUTFILE]" >&2
+  exit 2
+fi
+
+workstream=$1
+letter=$2
+[ -f "$workstream" ] || {
+  echo "no such workstream file: $workstream" >&2
+  exit 2
+}
+
+if [ $# -eq 3 ]; then
+  out=$3
+else
+  dir=$(git rev-parse --git-path wsd)
+  mkdir -p "$dir"
+  dir=$(cd "$dir" && pwd)
+  out="$dir/slice-${letter}-brief.md"
+fi
+
+awk -v letter="$letter" '
+  /^```/ { infence = !infence }
+  !infence && /^###[[:space:]]+Slice[[:space:]]+[A-Z]:/ {
+    inslice = ($0 ~ ("^###[[:space:]]+Slice[[:space:]]+" letter ":"))
+  }
+  inslice { print }
+' "$workstream" > "$out"
+
+if [ ! -s "$out" ]; then
+  echo "slice ${letter} not found in ${workstream} (no heading matching '### Slice ${letter}:')" >&2
+  exit 3
+fi
+
+echo "wrote ${out}: $(wc -l < "$out" | tr -d ' ') lines"

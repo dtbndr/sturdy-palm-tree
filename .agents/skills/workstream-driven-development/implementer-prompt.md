@@ -4,56 +4,49 @@ Use this template when dispatching an implementer subagent to execute a specific
 
 ```
 Task tool (general-purpose):
-  description: "Implement Slice: [Slice Letter] - [Slice Title]"
+  description: "Implement Slice [Slice Letter]: [Slice Title]"
+  model: [MODEL — REQUIRED: choose per SKILL.md model-selection guidance]
   prompt: |
     You are implementing Slice [Slice Letter]: [Slice Title]
 
-    ## Workstream Objective
-    [Paste the overall workstream objective from the Workstream Doc metadata]
+    ## Slice Brief
 
-    ## Slice Goal
-    [Paste the current slice goal here]
+    Read your slice brief first: [BRIEF_FILE]
+    It contains the full slice goal, tasks, watch-outs, verification, and manual smoke test requirements.
 
-    ## Tasks
-    [FULL TEXT of the tasks for this slice - paste it here, don't make the subagent read files]
-    [Tasks use checkbox format (- [ ]). Mark each checkbox done (- [x]) as you complete it.]
+    ## Context
 
-    ## Watch Out
-    [Paste the watch-outs for this slice here]
-
-    ## Verification
-    [Paste the verification steps and tests to run for this slice here]
-
-    ## Manual Smoke Test
-    [Paste the manual smoke test steps, setup, and expected outcomes for this slice here]
-
-    ## Prior Slice Carry-forward (if any)
-    [Paste the carry-forward information from the previous slice, if any]
+    Workstream objective: [WORKSTREAM_OBJECTIVE]
+    In-scope details: [IN_SCOPE_DETAILS]
+    Carry-forward from prior slices: [CARRY_FORWARD]
+    Additional relevant files/interfaces: [RELEVANT_CONTEXT]
 
     ## Before You Begin
 
     If you have questions about:
-    - The requirements or expected behavior of this slice
-    - The design decisions or implementation strategy
-    - Unclear details or missing configuration/schema definitions
+    - The requirements or acceptance criteria
+    - The approach or implementation strategy
+    - Dependencies, schema details, or assumptions
+    - Anything unclear in the slice brief
 
-    **Ask them now.** Raise any questions or concerns before starting work.
+    **Ask them now.** Raise any concerns before starting work.
 
     ## Your Job
 
-    Once you are clear on requirements:
-    1. Implement exactly what the slice tasks specify (do not build extra features)
-    2. Write focused tests (follow TDD if appropriate or if requested)
-    3. Run the specific verification commands for this slice
-    4. Commit your work upon success
-    5. Conduct a self-review (see below)
-    6. Report back with status and details
+    Once you're clear on requirements:
+    1. Implement exactly what the slice specifies
+    2. Write focused tests (follow TDD if required or appropriate)
+    3. Run the slice verification steps
+    4. Commit your work
+    5. Self-review (see below)
+    6. Report back
 
-    The controller will pause for a user manual smoke test only after your slice passes both review stages. Make sure your implementation supports the documented manual smoke test cleanly.
+    Work from: [DIRECTORY]
 
-    Work from: [directory]
+    **While you work:** If you encounter something unexpected or unclear, **ask questions**.
+    It's always OK to pause and clarify. Don't guess or make assumptions.
 
-    **While you work:** If you encounter unexpected behavior, compilation errors, or roadblocks, **ask questions** or report immediately. Do not guess or make blind assumptions.
+    While iterating, run the focused test for what you're changing; run broader verification before committing, not after every edit.
 
     ## Code Organization
 
@@ -61,12 +54,17 @@ Task tool (general-purpose):
     reliable when files are focused. Keep this in mind:
     - Follow the key files and directory structure defined in the workstream
     - Each file/module should have one clear responsibility with a well-defined interface
-    - In existing codebases, follow established patterns. Improve code you are touching
+    - If a file you're creating grows beyond the slice's intent, stop and report it as
+      DONE_WITH_CONCERNS — don't split files on your own without workstream guidance
+    - If an existing file you're modifying is already large or tangled, work carefully
+      and note it as a concern in your report
+    - In existing codebases, follow established patterns. Improve code you're touching
       the way a good developer would, but do not restructure things outside your slice.
 
     ## When You're in Over Your Head
 
-    It is always OK to stop and say "this is too hard for me" or "I need more context." Bad work is worse than no work. You will not be penalized for escalating.
+    It is always OK to stop and say "this is too hard for me" or "I need more context."
+    Bad work is worse than no work. You will not be penalized for escalating.
 
     **STOP and escalate when:**
     - You encounter architectural conflicts that affect other slices or packages
@@ -74,7 +72,8 @@ Task tool (general-purpose):
     - You feel uncertain about whether your implementation meets the core objective
     - You are stuck in a loop of failing tests or compilation errors
 
-    **How to escalate:** Report back with status BLOCKED or NEEDS_CONTEXT. Describe specifically what you are stuck on, what you have tried, and what kind of help you need.
+    **How to escalate:** Report back with status BLOCKED or NEEDS_CONTEXT. Describe
+    specifically what you are stuck on, what you have tried, and what kind of help you need.
 
     ## Before Reporting Back: Self-Review
 
@@ -86,26 +85,47 @@ Task tool (general-purpose):
 
     **Quality:**
     - Is this my best work?
-    - Are variable and function names clear, descriptive, and accurate?
-    - Is there any dead code, commented-out logic, or console.logs?
+    - Are names clear, descriptive, and accurate?
+    - Is there any dead code, commented-out logic, or debug logging?
 
     **Discipline:**
-    - Did I avoid overbuilding? Did I stick strictly to this slice's scope (YAGNI)?
+    - Did I avoid overbuilding and stay strictly inside this slice's scope (YAGNI)?
     - Did I follow the established patterns in the codebase?
 
     **Testing & Verification:**
-    - Do the tests actually verify behavior (not just mock everything out)?
-    - Did I run the specified verification commands and verify they pass clean?
+    - Do the tests actually verify behavior (not just mocks)?
+    - Did I run the specified verification commands and confirm they pass cleanly?
 
     If you find issues during self-review, fix and commit them now before reporting.
 
+    ## After Review Findings
+
+    If a reviewer finds issues and you fix them, re-run the tests that cover the amended
+    code and append the results to your report file. Reviewers should be able to rely on
+    your report as the test evidence.
+
     ## Report Format
 
-    When done, report:
-    - **Status:** DONE | DONE_WITH_CONCERNS | BLOCKED | NEEDS_CONTEXT
-    - What you implemented
-    - What you tested and the exact test results
-    - Files changed and the commit SHA
+    Write your full report to [REPORT_FILE]:
+    - What you implemented (or what you attempted, if blocked)
+    - What you tested and exact test results
+    - **TDD Evidence** (if TDD was required for this slice):
+      - RED: command run, relevant failing output before implementation, and why the failure was expected
+      - GREEN: command run and relevant passing output after implementation
+    - Files changed
     - Self-review findings (if any)
     - Any lingering concerns or carry-forward notes for the next slice
+
+    Then report back with ONLY:
+    - **Status:** DONE | DONE_WITH_CONCERNS | BLOCKED | NEEDS_CONTEXT
+    - Commits created (short SHA + subject)
+    - One-line test summary
+    - Your concerns, if any
+    - The report file path
+
+    If BLOCKED or NEEDS_CONTEXT, put the specifics in the final message itself.
+
+    Use DONE_WITH_CONCERNS if you completed the work but have doubts about correctness.
+    Use BLOCKED if you cannot complete the slice. Use NEEDS_CONTEXT if you need
+    information that wasn't provided. Never silently produce work you're unsure about.
 ```

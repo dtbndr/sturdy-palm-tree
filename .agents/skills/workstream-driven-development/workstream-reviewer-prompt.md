@@ -2,62 +2,102 @@
 
 Use this template when dispatching a workstream compliance reviewer subagent.
 
-**Purpose:** Verify that the implementer built exactly what was requested in the current workstream slice (nothing more, nothing less)
+**Purpose:** Verify that the implementer built exactly what was requested in the current workstream slice — nothing more, nothing less.
 
 ```
 Task tool (general-purpose):
-  description: "Review workstream compliance for Slice [Slice Letter]"
+  description: "Review workstream compliance for Slice [SLICE_LETTER]"
+  model: [MODEL — REQUIRED: choose per SKILL.md model-selection guidance]
   prompt: |
     You are reviewing whether a slice implementation matches its specification.
 
-    ## Slice Goal & Tasks
-    [FULL TEXT of the current slice goal, tasks, verification requirements, and manual smoke test requirements]
+    ## What Was Requested
 
-    ## What Implementer Claims They Built
-    [From implementer's report]
+    Read the slice brief: [BRIEF_FILE]
 
-    ## CRITICAL: Do Not Trust the Report
+    Workstream-level constraints that bind this slice:
+    [GLOBAL_CONSTRAINTS]
 
-    The implementer may have completed the slice quickly, and their report could be incomplete,
-    inaccurate, or overly optimistic. You MUST verify everything independently.
+    ## What the Implementer Claims They Built
 
-    **DO NOT:**
-    - Take their word for what they implemented
-    - Trust their claims about completeness or test success
-    - Accept their interpretation of requirements without verifying
+    Read the implementer's report: [REPORT_FILE]
 
-    **DO:**
-    - Read the actual code they wrote in this slice
-    - Compare actual implementation to slice tasks line by line
-    - Check for missing pieces they claimed to implement but skipped or simplified
-    - Look for extra features or scope creep they added without authorization
+    ## Diff Under Review
+
+    **Base:** [BASE_SHA]
+    **Head:** [HEAD_SHA]
+    **Diff file:** [DIFF_FILE]
+
+    Read the diff file once — it contains the commit list, stat summary, and full diff with context.
+    Do not re-run git commands. Inspect code outside the diff only if you can name a specific risk
+    that requires one focused check.
+
+    ## Do Not Trust the Report
+
+    Treat the implementer's report as unverified claims about the code. It may be incomplete,
+    inaccurate, or overly optimistic. Verify against the diff and requirements.
+
+    ## Tests
+
+    The implementer already ran the tests and reported results for this slice. Do not re-run the
+    suite just to confirm their report. Run a focused test only when reading the code raises a
+    specific doubt you can name. If you cannot verify something from the diff alone, report it as
+    a cannot-verify item instead of broadening your search.
 
     ## Your Job
 
-    Read the implementation code and verify:
+    Check for:
 
     **Missing requirements:**
     - Did they implement every task listed in this slice?
-    - Are there edge cases or verification steps they skipped or missed?
-    - Did they claim something works but didn't actually implement it in the code?
+    - Are there edge cases, verification steps, or smoke-test requirements they skipped?
+    - Did they claim something works but not actually implement it?
 
-    **Extra/unneeded work (YAGNI):**
-    - Did they build things that weren't requested in this slice?
-    - Did they over-engineer or add unnecessary components/helpers?
-    - Did they start implementing future slices or "nice to haves"?
+    **Extra or unneeded work (YAGNI):**
+    - Did they build things that were not requested in this slice?
+    - Did they over-engineer or start implementing future slices?
 
     **Misunderstandings:**
-    - Did they interpret requirements differently than the slice goal intended?
-    - Did they solve the wrong problem or use a patterns-defying design?
+    - Did they solve the wrong problem or interpret the slice incorrectly?
     - Did they violate any architectural invariants?
 
-    **Manual smoke test readiness:**
-    - Does the implementation support the manual smoke test scenario defined for this slice?
-    - Are any required user-visible flows, setup assumptions, or expected outcomes obviously broken or missing?
+    **Manual smoke-test readiness:**
+    - Does the implementation support the documented manual smoke test cleanly?
+    - Are any required user-visible flows, setup assumptions, or expected outcomes obviously broken?
 
-    **Verify by reading code, not by trusting the report.**
+    ## Calibration
 
-    Report:
-    - ✅ Slice compliant (if everything matches after code inspection)
-    - ❌ Issues found: [list specifically what's missing, incorrect, or extra, with file:line references]
+    Categorize issues by actual severity:
+    - **Critical:** a blocker that makes the slice unsafe to accept at all
+    - **Important:** missing requirements, incorrect behavior, architectural violations, or issues that must be fixed before the slice can be trusted
+    - **Minor:** polish, optional cleanup, or non-blocking suggestions
+
+    If the Workstream Document explicitly mandates something that still looks defective, label it as
+    **workstream-mandated** and surface it rather than silently dismissing it.
+
+    Every issue must include file:line references.
+
+    ## Output Format
+
+    ### Workstream Compliance
+
+    - ✅ Slice compliant | ❌ Issues found: [what's missing, extra, or misunderstood, with file:line references]
+    - ⚠️ Cannot verify from diff: [requirements you could not verify from the diff alone and what the controller should check]
+
+    ### Strengths
+    - [Specific things done well]
+
+    ### Issues
+
+    #### Critical (Must Fix)
+    #### Important (Should Fix)
+    #### Minor (Nice to Have)
+
+    For each issue: file:line, what's wrong, why it matters, and how to fix it if not obvious.
+
+    ### Assessment
+
+    **Slice quality:** [Approved | Needs fixes]
+
+    **Reasoning:** [1-2 sentence technical assessment]
 ```
