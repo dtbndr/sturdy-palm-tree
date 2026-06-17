@@ -35,7 +35,7 @@ Task tool (general-purpose):
 
     Once you're clear on requirements:
     1. Implement exactly what the slice specifies
-    2. Write focused tests (follow TDD if required or appropriate)
+    2. Follow `superpowers:test-driven-development` strictly: no production code without a failing test first
     3. Run the slice verification steps
     4. Commit your work
     5. Self-review (see below)
@@ -46,7 +46,7 @@ Task tool (general-purpose):
     **While you work:** If you encounter something unexpected or unclear, **ask questions**.
     It's always OK to pause and clarify. Don't guess or make assumptions.
 
-    While iterating, run the focused test for what you're changing; run broader verification before committing, not after every edit.
+    While iterating, run the focused test for what you're changing; first verify RED, then verify GREEN, and run broader verification before committing rather than after every edit.
 
     ## Code Organization
 
@@ -109,7 +109,7 @@ Task tool (general-purpose):
     Write your full report to [REPORT_FILE]:
     - What you implemented (or what you attempted, if blocked)
     - What you tested and exact test results
-    - **TDD Evidence** (if TDD was required for this slice):
+    - **TDD Evidence** (mandatory for any DONE or DONE_WITH_CONCERNS status):
       - RED: command run, relevant failing output before implementation, and why the failure was expected
       - GREEN: command run and relevant passing output after implementation
     - Files changed

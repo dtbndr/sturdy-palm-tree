@@ -39,9 +39,9 @@ Task tool (general-purpose):
 
     ## Tests
 
-    The implementer already ran the tests and reported results for this slice. Do not re-run the
-    suite just to confirm their report. Run a focused test only when reading the code raises a
-    specific doubt you can name. If you cannot verify something from the diff alone, report it as
+    The implementer already ran the tests and reported results for this slice, including TDD evidence.
+    Do not re-run the suite just to confirm their report. Run a focused test only when reading the
+    code raises a specific doubt you can name. If you cannot verify something from the diff alone, report it as
     a cannot-verify item instead of broadening your search.
 
     ## Your Job
@@ -65,11 +65,16 @@ Task tool (general-purpose):
     - Does the implementation support the documented manual smoke test cleanly?
     - Are any required user-visible flows, setup assumptions, or expected outcomes obviously broken?
 
+    **TDD gate verification:**
+    - Does the implementer's report contain credible RED and GREEN evidence for the behavior changed in this slice?
+    - Does the diff show corresponding test creation or modification alongside the production change?
+    - If the tests appear to have passed immediately, were added only after the implementation, or the report omits real RED/GREEN evidence, fail the compliance review.
+
     ## Calibration
 
     Categorize issues by actual severity:
     - **Critical:** a blocker that makes the slice unsafe to accept at all
-    - **Important:** missing requirements, incorrect behavior, architectural violations, or issues that must be fixed before the slice can be trusted
+    - **Important:** missing requirements, incorrect behavior, architectural violations, missing/invalid TDD evidence, or issues that must be fixed before the slice can be trusted
     - **Minor:** polish, optional cleanup, or non-blocking suggestions
 
     If the Workstream Document explicitly mandates something that still looks defective, label it as

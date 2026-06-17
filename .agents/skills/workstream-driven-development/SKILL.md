@@ -89,6 +89,12 @@ The following prompt templates and helper scripts are stored in this skill's dir
 - `scripts/slice-brief` - Extracts a single slice into a file for implementer handoff.
 - `scripts/review-package` - Creates the diff package used by reviewers.
 
+## Required Sub-skills
+
+Implementer subagents MUST be configured to use:
+
+- `superpowers:test-driven-development` - Mandatory for every slice. The implementer must follow a real red → green cycle and provide evidence for it in the slice report.
+
 ## Roles and Model Selection
 
 - **Controller (You)**: Oversees execution, manages the slice-to-slice state, updates the Todo task list, curates file contexts, and coordinates reviews. (Most capable model).
@@ -119,6 +125,7 @@ Always specify the model explicitly when dispatching a subagent. An omitted mode
 For each slice, dispatch the implementer subagent. Prefer file handoffs over pasted text:
 
 - Generate a slice brief with `scripts/slice-brief WORKSTREAM_FILE SLICE_LETTER` and pass the printed file path to the implementer.
+- Explicitly inject `superpowers:test-driven-development` into the implementer dispatch. Do not rely on ambient skill discovery or a vague mention of testing.
 - Provide the Workstream Objective, in-scope details, and any carry-forward context the brief cannot know.
 - Name a report file for the implementer so detailed implementation notes and test evidence live on disk, not in controller context.
 - Provide only the relevant existing code files or interfaces for this slice (do NOT provide files unrelated to the slice).
@@ -127,7 +134,7 @@ For each slice, dispatch the implementer subagent. Prefer file handoffs over pas
 
 ### 3. Reviewing the Slice
 
-- **Stage 1 (Workstream Compliance)**: Once the implementer reports `DONE` or `DONE_WITH_CONCERNS`, generate a diff package with `scripts/review-package BASE HEAD` and dispatch the `workstream-reviewer`. The reviewer checks the diff and reported test evidence to verify every task inside the slice is met, nothing was missed, and no unrequested features were built.
+- **Stage 1 (Workstream Compliance)**: Once the implementer reports `DONE` or `DONE_WITH_CONCERNS`, generate a diff package with `scripts/review-package BASE HEAD` and dispatch the `workstream-reviewer`. The reviewer checks the diff and reported TDD/test evidence to verify every task inside the slice is met, the red → green cycle actually happened, nothing was missed, and no unrequested features were built.
 - **Stage 2 (Code Quality)**: Dispatch the `code-quality-reviewer` with the same review package. They check readability, test coverage, maintainability, project conventions, and code organization.
 - If a reviewer reports a requirement they cannot verify from the diff alone, resolve it yourself from the workstream context before marking the slice complete. If it is a real gap, send it back as a failed review.
 - If any reviewer flags issues, have the implementer fix them and re-review. Do NOT manually fix reviewer-flagged issues yourself. If the original implementer is unavailable, aggregate all findings into a single fix dispatch rather than spawning one fixer per issue.
@@ -162,6 +169,7 @@ Conversation memory does not survive compaction. Track durable slice progress in
 
 - **Creating a new worktree per slice**: Absolutely NOT. Keep everything in one worktree.
 - **Letting subagents read the Workstream Doc**: Subagents should NOT read the Workstream Doc. Provide the curated text and tasks for their specific slice to protect their context window.
+- **Treating TDD as optional**: Do not dispatch implementers without `superpowers:test-driven-development`, and do not accept "tests added later" as equivalent to a real red → green cycle.
 - **Proceeding while a slice review fails**: Never start the next slice while there are open compliance or quality issues in the current slice.
 - **Skipping the manual smoke test pause**: Never continue to the next slice once both review stages pass without pausing for the user's manual smoke test.
 - **Failing to commit**: Ensure each slice is committed before starting reviews, and any fixes are also committed.
