@@ -3,17 +3,18 @@
 # diff with extended context, written to a file the reviewer reads in one
 # call.
 #
-# Usage: review-package BASE HEAD [OUTFILE]
-# Default OUTFILE: <git-dir>/wsd/review-<base7>..<head7>.diff
+# Usage: review-package BASE HEAD WORKSPACE_SLUG
+# Output: .solopowers/wsd/<slug>/review-<base7>..<head7>.diff
 set -euo pipefail
 
-if [ $# -lt 2 ] || [ $# -gt 3 ]; then
-  echo "usage: review-package BASE HEAD [OUTFILE]" >&2
+if [ $# -ne 3 ]; then
+  echo "usage: review-package BASE HEAD WORKSPACE_SLUG" >&2
   exit 2
 fi
 
 base=$1
 head=$2
+workspace=$3
 
 git rev-parse --verify --quiet "$base" >/dev/null || {
   echo "bad BASE: $base" >&2
@@ -24,14 +25,8 @@ git rev-parse --verify --quiet "$head" >/dev/null || {
   exit 2
 }
 
-if [ $# -eq 3 ]; then
-  out=$3
-else
-  dir=$(git rev-parse --git-path wsd)
-  mkdir -p "$dir"
-  dir=$(cd "$dir" && pwd)
-  out="$dir/review-$(git rev-parse --short "$base")..$(git rev-parse --short "$head").diff"
-fi
+dir=$("${BASH_SOURCE[0]%/*}/wsd-workspace" "$workspace")
+out="$dir/review-$(git rev-parse --short "$base")..$(git rev-parse --short "$head").diff"
 
 {
   echo "# Review package: ${base}..${head}"
