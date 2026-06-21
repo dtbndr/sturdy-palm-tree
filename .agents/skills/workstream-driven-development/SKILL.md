@@ -85,7 +85,7 @@ The following prompt templates and helper scripts are stored in this skill's dir
 
 Implementer subagents MUST be configured to use:
 
-- `superpowers:test-driven-development` - Mandatory for every slice. The implementer must follow a real red → green cycle and provide evidence for it in the slice report.
+- `solopowers:test-driven-development` - Mandatory for every slice. The implementer must follow a real red → green cycle and provide evidence for it in the slice report.
 
 ## Roles and Model Selection
 
@@ -138,7 +138,7 @@ Implementer subagents report one of four statuses. Handle each appropriately:
 For each slice, dispatch the implementer subagent. Prefer file handoffs over pasted text:
 
 - Generate a slice brief with `scripts/slice-brief WORKSTREAM_FILE SLICE_LETTER` and pass the printed file path to the implementer.
-- Explicitly inject `superpowers:test-driven-development` into the implementer dispatch. Do not rely on ambient skill discovery or a vague mention of testing.
+- Explicitly inject `solopowers:test-driven-development` into the implementer dispatch. Do not rely on ambient skill discovery or a vague mention of testing.
 - Provide the Workstream Objective, in-scope details, and any carry-forward context the brief cannot know.
 - Name a report file for the implementer so detailed implementation notes and test evidence live on disk, not in controller context.
 - Provide only the relevant existing code files or interfaces for this slice (do NOT provide files unrelated to the slice).
@@ -200,7 +200,7 @@ The ledger file lives inside the per-workstream workspace directory (`.solopower
 
 - **Creating a new worktree per slice**: Absolutely NOT. Keep everything in one worktree.
 - **Letting subagents read the Workstream Doc**: Subagents should NOT read the Workstream Doc. Provide the curated text and tasks for their specific slice to protect their context window.
-- **Treating TDD as optional**: Do not dispatch implementers without `superpowers:test-driven-development`, and do not accept "tests added later" as equivalent to a real red → green cycle.
+- **Treating TDD as optional**: Do not dispatch implementers without `solopowers:test-driven-development`, and do not accept "tests added later" as equivalent to a real red → green cycle.
 - **Proceeding while a slice review fails**: Never start the next slice while there are open review findings in the current slice.
 - **Skipping the manual smoke test pause**: Never continue to the next slice once review passes without pausing for the user's manual smoke test.
 - **Failing to commit**: Ensure each slice is committed before starting reviews, and any fixes are also committed.

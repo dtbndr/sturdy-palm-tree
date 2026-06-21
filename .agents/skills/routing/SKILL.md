@@ -1,6 +1,6 @@
 ---
 name: routing
-description: "Use when starting any conversation - resolves which skills to use in this project. Project-local workstream skills replace legacy superpowers equivalents."
+description: "Use when starting any conversation - resolves which skills to use in this project. Project-local workstream skills replace legacy solopowers equivalents."
 ---
 
 # Project Skill Routing
