@@ -1,1 +1,6 @@
 artifacts/
+.agents/
+.claude/
+.pi/
+.specify/
+skills-lock.json
